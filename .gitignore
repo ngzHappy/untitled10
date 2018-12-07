@@ -1,0 +1,10 @@
+debug/
+release/
+*.obj
+*.db
+*.opendb
+*.ipch
+*.user
+*.filters
+*.vcxproj
+*.stash
