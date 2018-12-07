@@ -26,7 +26,8 @@ void TextDraw::layoutThis() {
 void TextDraw::layoutTitle(std::shared_ptr<TextLayoutPack> argPack) {
 
     auto & mmmCurrentHeight = argPack->mmmCurrentHeight;
-    mmmPages.push_back(std::make_shared<Page>());
+    auto varCurrentPage = std::make_shared<Page>();
+    mmmPages.push_back(varCurrentPage);
     mmmPages.rbegin()->get()->startX = 0;
 
     const auto varLineWidth =
@@ -35,6 +36,9 @@ void TextDraw::layoutTitle(std::shared_ptr<TextLayoutPack> argPack) {
         mmmDrawPack->rightMargin;
 
     mmmTitleLayout.setText(mmmDrawPack->titleRawString);
+    if (false == mmmDrawPack->titleRawString.isEmpty()) {
+        varCurrentPage->startLine = 1;
+    }
     mmmTitleLayout.setFont(mmmDrawPack->titleFont);
 
     QFontMetricsF varFontMetrics{ mmmDrawPack->titleFont };
@@ -48,6 +52,7 @@ void TextDraw::layoutTitle(std::shared_ptr<TextLayoutPack> argPack) {
         if (!varLine.isValid()) {
             break;
         }
+        ++(argPack->mmmCurrentBodyLine);
         varLine.setLineWidth(varLineWidth);
         mmmCurrentHeight += varLeading;
         varLine.setPosition({ mmmDrawPack->leftMargin  , mmmCurrentHeight });
@@ -90,10 +95,6 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
             }
             varParagraphs.push_back(std::move(var));
         }
-    }
-
-    if (varParagraphs.empty() == false) {
-        mmmPages.begin()->get()->startLine = 1;
     }
 
     for (const auto & varRawTextLine : varParagraphs) {
@@ -163,8 +164,7 @@ QImage TextDraw::draw(Float argX) {
 
     if (argX < 0) {
         argX = 0;
-    }
-    if (mmmPages.empty() == false) {
+    } else if (mmmPages.empty() == false) {
         if (argX > mmmPages.crbegin()->get()->startX) {
             argX = mmmPages.crbegin()->get()->startX;
         }
