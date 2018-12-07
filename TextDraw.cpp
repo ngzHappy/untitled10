@@ -101,7 +101,7 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
     const auto varParagraphSpace = varFontMetrics.width(QStringLiteral("    "));
     for (const auto & varRawTextLine : varParagraphs) {
 
-        bool varIsFirstLine=true;
+        bool varIsFirstLine = true;
         auto varCurrentBodyLayout = std::make_shared< QTextLayout >();
         varCurrentBodyLayout->setText(varRawTextLine);
         varCurrentBodyLayout->setFont(mmmDrawPack->bodyFont);
@@ -120,10 +120,10 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
             }
             ++(argPack->mmmCurrentBodyLine);
 
-            if(varIsFirstLine){
-                varLine.setLineWidth(varLineWidth-varParagraphSpace);
-            }else{
-                 varLine.setLineWidth(varLineWidth);
+            if (varIsFirstLine) {
+                varLine.setLineWidth(varLineWidth - varParagraphSpace);
+            } else {
+                varLine.setLineWidth(varLineWidth);
             }
 
             auto varBeginLineHeight = mmmCurrentHeight + varLeading;
@@ -140,11 +140,11 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
                 mmmPages.rbegin()->get()->startLine = argPack->mmmCurrentBodyLine;
             }
 
-            if(varIsFirstLine){
+            if (varIsFirstLine) {
                 varLine.setPosition({ mmmCurrentWidth + varParagraphSpace ,
                                       varBeginLineHeight });
-                varIsFirstLine=false ;
-            }else{
+                varIsFirstLine = false;
+            } else {
                 varLine.setPosition({ mmmCurrentWidth ,
                                       varBeginLineHeight });
             }
@@ -222,17 +222,34 @@ QImage TextDraw::draw(Float argX) {
         varPageWidth, varPageHeight, QImage::Format_RGBA64
     };
     QPainter varPainter{ &varImage };
+    varPainter.setRenderHints(QPainter::Antialiasing |
+        QPainter::TextAntialiasing |
+        QPainter::HighQualityAntialiasing |
+        QPainter::SmoothPixmapTransform);
 
     varImage.fill({ 0,0,0,0 });
     const auto varDrawPos = QPointF(-argX, 0);
 
     for (const auto & varPage : varDrawPages) {
+        const auto varStartLine = varPage->startLine;
+        auto varLineDiff = 0;
         for (const auto & varLine : varPage->lines) {
-            varLine.draw(&varPainter, varDrawPos);
+            const auto varCurrentLineIndex = varStartLine + varLineDiff;
+            this->drawLine(&varPainter, &varLine, varDrawPos, varCurrentLineIndex);
+            ++varLineDiff;
         }
     }
 
     return std::move(varImage);
 
+}
+
+void TextDraw::drawLine(
+    QPainter * argPainter,
+    const QTextLine * argLine,
+    const QPointF & argTopLeft,
+    Integer argLineNumber) {
+    argLine->draw(argPainter, argTopLeft);
+    (void)argLineNumber;
 }
 

@@ -50,6 +50,7 @@ public:
     void layout(std::shared_ptr<const TextDrawPack>);
     QImage draw(Float x);
 protected:
+    virtual void drawLine(QPainter *,const QTextLine*,const QPointF &, Integer);
     void layoutThis();
     void layoutTitle(std::shared_ptr<TextLayoutPack>);
     void layoutBody(std::shared_ptr<TextLayoutPack>);
