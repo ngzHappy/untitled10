@@ -97,14 +97,16 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
         }
     }
 
+    QFontMetricsF varFontMetrics{ mmmDrawPack->bodyFont };
+    const auto varParagraphSpace = varFontMetrics.width(QStringLiteral("    "));
     for (const auto & varRawTextLine : varParagraphs) {
 
+        bool varIsFirstLine=true;
         auto varCurrentBodyLayout = std::make_shared< QTextLayout >();
         varCurrentBodyLayout->setText(varRawTextLine);
         varCurrentBodyLayout->setFont(mmmDrawPack->bodyFont);
         mmmBodyLayouts.push_front(varCurrentBodyLayout);
 
-        QFontMetricsF varFontMetrics{ mmmDrawPack->bodyFont };
         const auto varLeading = varFontMetrics.leading();
         const auto varHeight = varFontMetrics.height();
         const auto varBeginPageHeightBeginFirstLine = mmmDrawPack->topMargin + varLeading;
@@ -118,7 +120,12 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
             }
             ++(argPack->mmmCurrentBodyLine);
 
-            varLine.setLineWidth(varLineWidth);
+            if(varIsFirstLine){
+                varLine.setLineWidth(varLineWidth-varParagraphSpace);
+            }else{
+                 varLine.setLineWidth(varLineWidth);
+            }
+
             auto varBeginLineHeight = mmmCurrentHeight + varLeading;
             auto varEndLineHeight = varHeight + varBeginLineHeight;
 
@@ -133,7 +140,14 @@ void TextDraw::layoutBody(std::shared_ptr<TextLayoutPack> argPack) {
                 mmmPages.rbegin()->get()->startLine = argPack->mmmCurrentBodyLine;
             }
 
-            varLine.setPosition({ mmmCurrentWidth , varBeginLineHeight });
+            if(varIsFirstLine){
+                varLine.setPosition({ mmmCurrentWidth + varParagraphSpace ,
+                                      varBeginLineHeight });
+                varIsFirstLine=false ;
+            }else{
+                varLine.setPosition({ mmmCurrentWidth ,
+                                      varBeginLineHeight });
+            }
             mmmCurrentHeight = varEndLineHeight;
             mmmPages.rbegin()->get()->lines.push_back(varLine);
 

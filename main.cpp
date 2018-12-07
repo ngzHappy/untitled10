@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
     varDrawPack->titleBodySpace = 20 ;
     varTextDraw.layout(varDrawPack);
 
-    auto varImage = varTextDraw.draw(128);
+    auto varImage = varTextDraw.draw(0);
 
     w.setImage(varImage);
     w.show();
